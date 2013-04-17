@@ -1,8 +1,6 @@
 $(function(){
-	$('.edBox').Framer({
-		soundcloud: true
-	});
+	$('.framer').Framer();
 	_V_.options.flash.swf = "./js/videojs/video-js.swf";
-	
+
 	prettyPrint();
 });

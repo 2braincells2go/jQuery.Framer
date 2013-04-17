@@ -78,7 +78,6 @@
 
 			FRM.indicator = new Spinner(loading_options).spin(FRM.loading[0]);
 			FRM.body.append(FRM.loading);
-			// FRM.loading.activity({color: settings.loadingColor});
 			
 			FRM.body.append(overlay);
 			overlay.fadeTo(settings.overlayTime, settings.opacity);
@@ -143,9 +142,6 @@
 			else if(FRM.type == 'iframe') {
 				FRM.contents = getiFrameContents();
 			}
-			// else if(FRM.type == 'soundcloud') {
-			// 	getSCContents.apply(this);
-			// }
 			else if(FRM.type == 'ajax') {
 				getAjaxContents.apply(this);
 			}
@@ -227,7 +223,7 @@
 			}
 			
 			if(isIE8()) {
-				console.log('isIE8');
+				// console.log('isIE8');
 				FRM.box.show();
 				showContentsComplete();
 			}
@@ -543,7 +539,6 @@
 		var getVimeoContents = function() {
 			var regx = FRM.target.attr('href').match(/vimeo\.com\/([^#\&\?]*).*/i);
 			var movieId = regx[1];
-			console.log(movieId);
 			
 			var vimeo = $('<iframe frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>');
 			
@@ -560,26 +555,7 @@
 
 		var getSCContents = function() {
 			//<iframe width="100%" height="166" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=http%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F34019569"></iframe>
-			
-			// SC.initialize({
-			//   client_id: '09d561105c5537b436dd67bd2ad9333b'
-			// });
 
-			// SC.get('/resolve', { url: FRM.target.attr('href') }, function(track) {
-			// 	console.log(track.uri);
-			// 	if(track.uri != undefined) {
-			// 		var sc_frame = $('<iframe frameborder="0"></iframe>');
-			// 		sc_frame.attr({
-			// 			src: "https://w.soundcloud.com/player/?url=" + FRM.target.attr('href'),
-			// 			width: FRM.target.attr('data-framer-width') || settings.width,
-			// 			height: "166"
-			// 		});
-			// 
-			// 		FRM.contents = sc_frame;
-			// 		showContents();
-			// 	}
-			// });
-			
 			var soundcloud = $('<iframe frameborder="0"></iframe>');
 			soundcloud.attr({
 				src: "https://w.soundcloud.com/player/?url=" + FRM.target.attr('href'),
@@ -681,13 +657,6 @@
 				return false;
 			}
 		}
-
-
-
-
-		// if(settings.soundcloud == true) {
-		// 	$("body").append('<script src="http://connect.soundcloud.com/sdk.js"></script>');
-		// }
 		
 		this.on('click.Framer', $.Framer.open);
 		

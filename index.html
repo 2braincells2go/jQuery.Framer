@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>jQuery edBox - eternity design</title>
+<title>jQuery Framer - eternity design</title>
 <link rel="stylesheet" type="text/css" href="./css/sample.css" media="all" />
 <link rel="stylesheet" type="text/css" href="./css/jquery.Framer.css" media="all" />
 <link rel="stylesheet" type="text/css" href="./js/videojs/video-js.css" media="all" />
@@ -16,26 +16,22 @@
 <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 <![endif]-->
 <script type="text/javascript">
-
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-403172-2']);
-  _gaq.push(['_setDomainName', 'eternitydesign.net']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-403172-2']);
+	_gaq.push(['_setDomainName', 'eternitydesign.net']);
+	_gaq.push(['_trackPageview']);
+	
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
 </script>
 </head>
 <body>
 <header>
-<h1>
-<a href="http://eternitydesign.net/" target="_blank" id="logo">jQuery edBox plugin</a>
+<h1><a href="http://eternitydesign.net/" target="_blank" id="logo">jQuery Framer plugin</a></h1>
 <a href="http://eternitydesign.net/" target="_blank">eternity design</a>
-</h1>
 </header>
 
 <div id="container">
@@ -43,13 +39,11 @@
 <section id="setup">
 <h1>Setup</h1>
 <code class="prettyprint lang-html">
-&lt;ink rel="stylesheet" type="text/css" href="./css/jquery.edBox.css" media="all" /&gt;<br />
+&lt;ink rel="stylesheet" type="text/css" href="./css/jquery.Framer.css" media="all" /&gt;<br />
 &lt;script type="text/javascript" src="./js/jquery.js"&gt;&lt;/script&gt;<br />
-&lt;script type="text/javascript" src="./js/jquery.edBox.js"&gt;&lt;/script&gt;<br />
-&lt;script type="text/javascript" src="./js/activity-indicator.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="./js/jquery.Framer.js"&gt;&lt;/script&gt;<br />
 </code>
-<p>ローディングの表示に、<a href="http://neteye.github.com/activity-indicator.html" target="_blank">Activity Indicator</a>を使用しているので、JSファイルが必要です。<br />
-/images/edBoxも必要です。</p>
+<p>/images/framerも必要です。</p>
 <!-- /#setup --></section>
 
 <section id="example">
@@ -57,32 +51,32 @@
 
 <section id="image">
 <h2>Image</h2>
-<a href="http://pics.campl.us/f/2/2e45a63ff9bc6459c82eaea4aa8fa5bc.jpg" class="edBox">
+<a href="http://pics.campl.us/f/2/2e45a63ff9bc6459c82eaea4aa8fa5bc.jpg" class="framer">
 <img src="http://pics.campl.us/iphone/2/2e45a63ff9bc6459c82eaea4aa8fa5bc.jpg" style="width: 179px; height: 240px;">
 </a>
-<a href="http://pics.campl.us/f/8/8903b8be664618fd6e09d13ba825cccc.jpg" class="edBox"><img src="http://pics.campl.us/iphone/8/8903b8be664618fd6e09d13ba825cccc.jpg" alt="" style="width: 240px; height: 179px;" /></a>
-<a href="http://pics.campl.us/f/5/5b77323b02e9d7d4bdae0b12508b8207.jpg" class="edBox" data-framer-width="480" data-framer-height="358">
+<a href="http://pics.campl.us/f/8/8903b8be664618fd6e09d13ba825cccc.jpg" class="framer"><img src="http://pics.campl.us/iphone/8/8903b8be664618fd6e09d13ba825cccc.jpg" alt="" style="width: 240px; height: 179px;" /></a>
+<a href="http://pics.campl.us/f/5/5b77323b02e9d7d4bdae0b12508b8207.jpg" class="framer" data-framer-width="480" data-framer-height="358">
 <img src="http://pics.campl.us/iphone/5/5b77323b02e9d7d4bdae0b12508b8207.jpg" style="width: 240px; height: 179px;" />
 </a>
 </section>
 
 <section id="inline">
 <h2>Inline Contents</h2>
-<a href="#inline_sample" class="edBox sample" title="Inline Contents Sample" data-framer-description="inline content description">
+<a href="#inline_sample" class="framer sample" title="Inline Contents Sample" data-framer-description="inline content description">
 Inline Contents Sample
 </a>
 <code class="prettyprint lang-html">
-&lt;a href="#inline_sample" class="edBox" title="Inline Contents Sample" data-framer-description="inline content description"&gt;Inline Contents Sample&lt;/a&gt;
+&lt;a href="#inline_sample" class="framer" title="Inline Contents Sample" data-framer-description="inline content description"&gt;Inline Contents Sample&lt;/a&gt;
 </code>
 </section>
 
 <section id="video">
 <h2>Video (<a href="http://videojs.com/" target="_blank">Video.js</a> - HTML5 Video & Flash Video)</h2>
-<a href="http://video-js.zencoder.com/oceans-clip" class="edBox sample" data-framer-type="video" data-framer-width="640" data-framer-height="264" data-framer-video-class="video-js vjs-default-skin" data-framer-video-setup='{"controls": true, "autoplay": false, "preload": "auto", "poster": "http://video-js.zencoder.com/oceans-clip.png"}'>
+<a href="http://video-js.zencoder.com/oceans-clip" class="framer sample" data-framer-type="video" data-framer-width="640" data-framer-height="264" data-framer-video-class="video-js vjs-default-skin" data-framer-video-setup='{"controls": true, "autoplay": false, "preload": "auto", "poster": "http://video-js.zencoder.com/oceans-clip.png"}'>
 Movie
 </a>
 <code class="prettyprint lang-html">
-&lt;a href="http://video-js.zencoder.com/oceans-clip" class="edBox" data-framer-type="video" data-framer-width="640" data-framer-height="264" data-framer-video-class="video-js vjs-default-skin" data-framer-video-setup='{"controls": true, "autoplay": false, "preload": "auto", "poster": "http://video-js.zencoder.com/oceans-clip.png"}'&gt;
+&lt;a href="http://video-js.zencoder.com/oceans-clip" class="framer" data-framer-type="video" data-framer-width="640" data-framer-height="264" data-framer-video-class="video-js vjs-default-skin" data-framer-video-setup='{"controls": true, "autoplay": false, "preload": "auto", "poster": "http://video-js.zencoder.com/oceans-clip.png"}'&gt;
 Movie
 &lt;/a&gt;
 </code>
@@ -106,11 +100,11 @@ Movie
 
 <section id="youtube">
 <h2>Media</h2>
-<a href="http://www.youtube.com/watch?v=6TtGqQtChxw" class="edBox sample" data-framer-width="560" data-framer-height="315">YouTube</a>
-<a href="http://vimeo.com/62930885" class="edBox sample">Vimeo</a>
-<a href="https://soundcloud.com/bt/bt-skylarking" class="edBox sample">SoundCloud</a>
+<a href="http://www.youtube.com/watch?v=6TtGqQtChxw" class="framer sample" data-framer-width="560" data-framer-height="315">YouTube</a>
+<a href="http://vimeo.com/62930885" class="framer sample">Vimeo</a>
+<a href="https://soundcloud.com/bt/bt-skylarking" class="framer sample">SoundCloud</a>
 <code class="prettyprint lang-html">
-&lt;a href="http://www.youtube.com/watch?v=6TtGqQtChxw" class="edBox" data-framer-width="560" data-framer-height="315"&gt;YouTube&lt;/a&gt;
+&lt;a href="http://www.youtube.com/watch?v=6TtGqQtChxw" class="framer" data-framer-width="560" data-framer-height="315"&gt;YouTube&lt;/a&gt;
 </code>
 
 <div class="options">
@@ -126,9 +120,9 @@ Movie
 
 <section id="iframe">
 <h2>iframe</h2>
-<a href="http://blog.eternitydesign.net/" class="edBox sample" data-framer-width="800" data-framer-height="600" data-framer-type="iframe">eternity design BLOG</a>
+<a href="http://blog.eternitydesign.net/" class="framer sample" data-framer-width="800" data-framer-height="600" data-framer-type="iframe">eternity design BLOG</a>
 <code class="prettyprint lang-html">
-&lt;a href="http://blog.eternitydesign.net/" class="edBox" data-framer-width="800" data-framer-height="600" data-framer-type="iframe"&gt;eternity design BLOG&lt;/a&gt;
+&lt;a href="http://blog.eternitydesign.net/" class="framer" data-framer-width="800" data-framer-height="600" data-framer-type="iframe"&gt;eternity design BLOG&lt;/a&gt;
 </code>
 
 <div class="options">
@@ -146,9 +140,9 @@ Movie
 
 <section id="ajax">
 <h2>Ajax</h2>
-<a href="ajax.html" class="edBox sample" data-framer-type="ajax">Ajax Contents</a>
+<a href="ajax.html" class="framer sample" data-framer-type="ajax">Ajax Contents</a>
 <code class="prettyprint lang-html">
-&lt;a href="ajax.html" class="edBox" data-framer-type="ajax"&gt;Ajax Contents&lt;/a&gt;
+&lt;a href="ajax.html" class="framer" data-framer-type="ajax"&gt;Ajax Contents&lt;/a&gt;
 </code>
 
 <div class="options">
@@ -162,9 +156,9 @@ Movie
 <!-- /#example --></section>
 
 <section id="option">
-<h1>Option</h1>
+<h1>Options</h1>
 <pre class="prettyprint lang-js">
-$('.edBox').edBox({
+$('.framer').Framer({
 	opacity: 0.8,
 	overlayTime: 500,
 	isOverlayClose: true,
@@ -175,10 +169,10 @@ $('.edBox').edBox({
 	title: '&lt;div id="edTitle"&gt;&lt;/div&gt;',
 	description: '&lt;div id="edDescription"&gt;&lt;/div&gt;',
 	closeBtn: '&lt;div class="close_btn"&gt;&lt;/div&gt;',
-	inner: $('&lt;div id="edBox_inner"&gt;&lt;/div&gt;'),
+	inner: $('&lt;div id="Framer_inner"&gt;&lt;/div&gt;'),
 	width: 640,
 	height: 360,
-	iframe: '&lt;iframe name="edBox-iframe" frameborder="0"&gt;&lt;/iframe&gt;',
+	iframe: '&lt;iframe name="framer-iframe" frameborder="0"&gt;&lt;/iframe&gt;',
 	ajaxDataType: 'html'
 });
 </pre>
@@ -197,7 +191,7 @@ $('.edBox').edBox({
 <dt>isAutoResize</dt><!--
 --><dd>自動でリサイズするかどうか</dd>
 <dt>isScroll</dt><!--
---><dd>スクロール時にedBoxの位置も移動させるかどうか true or false</dd>
+--><dd>スクロール時にFramerの位置も移動させるかどうか true or false</dd>
 <dt>resizeRatio</dt><!--
 --><dd>リサイズの比率、ページサイズに対して</dd>
 <dt>speed</dt><!--
@@ -209,7 +203,7 @@ $('.edBox').edBox({
 <dt>closeBtn</dt><!--
 --><dd>CloseボタンのHTML</dd>
 <dt>inner</dt><!--
---><dd>div#edBox内にHTMLコード挿入したいときとか</dd>
+--><dd>div#framer内にHTMLコード挿入したいときとか</dd>
 <dt>width</dt><!--
 --><dd>デフォルトwidth</dd>
 <dt>height</dt><!--
