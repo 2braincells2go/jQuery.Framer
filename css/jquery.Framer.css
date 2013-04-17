@@ -48,7 +48,7 @@ div#frmTitle {
 	top: 0;
 	left: 0;
 }
-divfrmDescription {
+div#frm_description {
 	position: absolute;
 	bottom: 0;
 	right: 0;

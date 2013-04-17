@@ -3,7 +3,7 @@
 
 	Author: Hirohisa Nagai
 	Copyright: eternity design ( http://eternitydesign.net/ )
-	Version: 0.55
+	Version: 0.60
 	License: MIT License
 	
 	include spin.js
@@ -26,7 +26,7 @@
 			resizeRatio: 0.9,
 			speed: 500,
 			title: '<div id="frmTitle"></div>',
-			description: '<div id="frmDescription"></div>',
+			description: '<div id="frm_description">{description}</div>',
 			closeBtn: '<div class="close_btn"></div>',
 			inner: {},
 			width: 640,
@@ -39,7 +39,6 @@
 		FRM.target;
 		FRM.body;
 		FRM.contents;
-		FRM.loading;
 		FRM.indicator;
 		FRM.box;
 		FRM.type;
@@ -47,6 +46,7 @@
 		FRM.description;
 		FRM.closeBtn;
 
+		var loading;
 		var overlay;
 		var scrollTimer;
 
@@ -61,7 +61,7 @@
 			overlay.height($(document).height()).width($(window).width());
 
 
-			FRM.loading = $('<div id="loading"></div>').css({
+			loading = $('<div id="loading"></div>').css({
 				width: $(window).width(),
 				height: $(window).height(),
 				top: $(window).scrollTop(),
@@ -76,8 +76,8 @@
 				left: $(window).width() * 0.5
 			};
 
-			FRM.indicator = new Spinner(loading_options).spin(FRM.loading[0]);
-			FRM.body.append(FRM.loading);
+			FRM.indicator = new Spinner(loading_options).spin(loading[0]);
+			FRM.body.append(loading);
 			
 			FRM.body.append(overlay);
 			overlay.fadeTo(settings.overlayTime, settings.opacity);
@@ -150,6 +150,8 @@
 				showContents();
 			}
 			
+			FRM.box.addClass(FRM.type);
+			
 			$(window).on('resize.Framer', FramerResize);
 			
 			if(settings.isScroll) {
@@ -215,7 +217,7 @@
 			getPosition();
 			
 			FRM.indicator.stop();
-			FRM.loading.remove();
+			loading.remove();
 			delete FRM.indicator;
 			
 			if(settings.closeBtn != '') {

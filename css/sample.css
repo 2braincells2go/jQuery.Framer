@@ -51,6 +51,7 @@ header h1 a#logo {
 	font-size: 20px;
 	font-weight: bold;
 	padding-right: 20px;
+	color: #0f73df;
 }
 header a {
 	color: #2782e5;
@@ -66,9 +67,24 @@ header a.ed {
 header a.ed:hover {
 	color: #0c71df;
 }
+
+nav {
+	width: 800px;
+	margin-right: auto;
+	margin-left: auto;
+}
+nav ul {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+nav ul li {
+	display: inline-block;
+	/display: inline;
+	/zoom: 1;
+}
 div#container {
 	width: 100%;
-	background: url(../images/sample/contents_bg.png) repeat-x center top;
 	padding-top: 50px;
 }
 section {

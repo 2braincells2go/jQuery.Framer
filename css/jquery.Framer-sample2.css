@@ -1,0 +1,102 @@
+div#frm_overlay {
+	background: #000;
+	display: none;
+	left: 0;
+	position: absolute;
+	top: 0;
+	width: 100%;
+	z-index: 5000;
+	opacity: 0;
+	-webkit-transform: translate3d(0, 0, 0);
+}
+div#framer {
+	position: absolute;
+	display: none;
+	z-index: 9000;
+	background-color: #fff;
+	padding: 10px;
+	border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-box-shadow:  0px 0px 3px 0px rgba(0, 0, 0, 0.2);
+    box-shadow:  0px 0px 3px 0px rgba(0, 0, 0, 0.8);
+}
+div#framer.youtube,
+div#framer.video {
+	background-color: #000;
+}
+
+div#framer img {
+	display: block;
+}
+
+div#framer div.close_btn {
+	position: absolute;
+	bottom: -26px;
+	left: 50%;
+	width: 80px;
+	height: 26px;
+	overflow: hidden;
+	display: none;
+	cursor: pointer;
+	z-index: 8000;
+	background-color: #000;
+	color: #fff;
+	font-size: 10px;
+	margin-left: -40px;
+	font-weight: bold;
+	text-align: center;
+	line-height: 26px;
+	border-radius: 0 0 4px 4px;
+	-webkit-border-radius: 0 0 4px 4px;
+	-moz-border-radius: 0 0 4px 4px;
+}
+div#framer div.close_btn:hover {
+	background-color: #1c6ca6;
+}
+
+div#loading {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	z-index: 5100;
+	top: 0;
+	left: 0;
+}
+
+div#frmTitle {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+div#frm_description {
+	position: absolute;
+	bottom: 10px;
+	right: 0;
+	color: #fff;
+	width: 100%;
+}
+div#frm_description .descrition_wrap {
+	padding: 4px;
+	margin-right: 10px;
+	margin-left: 10px;
+	background-color: rgba(0, 0, 0, 0.6);
+}
+
+iframe {
+	margin: 0;
+	padding: 0;
+	border-style: none;
+	display: block;
+	border-width: 0;
+}
+
+div#framer_inner {
+	width: 100%;
+	height: 30px;
+	background-color: #000;
+}
+
+video {
+	display: block;
+}
