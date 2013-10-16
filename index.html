@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="./css/jquery.Framer.css" />
 <link rel="stylesheet" href="./js/videojs/video-js.css" />
 <link rel="stylesheet" href="./js/prettify/prettify.css" />
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script src="./js/jquery.Framer.js"></script>
 <script src="./js/videojs/video.js"></script>
 <script src="./js/prettify/prettify.js"></script>
@@ -160,6 +160,24 @@ Movie
 </dl>
 <!-- /.options --></div>
 </section>
+
+
+<section id="pushstate">
+<h2>PushState</h2>
+<a href="#inline_sample" class="ps_framer sample" title="PushState Sample" data-framer-ps="pushstate">
+PushState Sample
+</a>
+<code class="prettyprint lang-html">
+&lt;a href="#inline_sample" class="framer" data-framer-ps="portfolio"&gt;PushState Sample&lt;/a&gt;
+</code>
+
+<code class="prettyprint lang-js">
+$('.framer').Framer({
+	isPushState: true
+});
+</code>
+</section>
+
 <!-- /#example --></section>
 
 <section id="option">

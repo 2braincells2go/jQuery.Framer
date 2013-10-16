@@ -32,7 +32,9 @@
 			width: 640,
 			height: 360,
 			iframe: '<iframe name="framer-iframe" frameborder="0" id="framer-iframe"></iframe>',
-			ajaxDataType: 'html'
+			ajaxDataType: 'html',
+			isPushState: false,
+			isCSSAnim: false
 		}, settings);
 
 
@@ -45,10 +47,13 @@
 		FRM.title;
 		FRM.description;
 		FRM.closeBtn;
+		FRM.container = null;
 
 		var loading;
 		var overlay;
 		var scrollTimer;
+		var isMove = false;
+		var baseURL = location.href;
 
 
 		FRM.open = function() {
@@ -180,35 +185,54 @@
 				FRM.closeBtn.fadeOut(settings.speed);
 			}
 			overlay.fadeOut(settings.overlayTime);
-			FRM.box.fadeOut(settings.speed, function() {
-				if(FRM.type == 'inline') {
-					FRM.contents.hide();
-					FRM.body.append(FRM.contents);
-				}
-				else if(FRM.type == 'video') {
-					FramerVideo.destroy();
-				}
-				
-				if(!$.isEmptyObject(settings.inner)) {
-					$(settings.inner).remove();
-				}
-				
-				if(FRM.title) {
-					FRM.title.remove();
-				}
-				if(FRM.description) {
-					FRM.description.remove();
-				}
 
-				FRM.closeBtn.remove();
-				if(FRM.type != 'inline') {
-					FRM.contents.remove();
-				}
-				FRM.box.remove();
-				overlay.remove();
-				
-				FRM.body.trigger('close.Framer');
-			});
+			if(settings.isCSSAnim) {
+				FRM.box.removeClass('show');
+				setTimeout(destroyBox, settings.speed);
+			}
+			else {
+				FRM.box.fadeOut(settings.speed, destroyBox);
+			}
+		}
+
+
+		var destroyBox = function() {
+			if(FRM.type == 'inline') {
+				FRM.contents.hide();
+				FRM.body.append(FRM.contents);
+			}
+			else if(FRM.type == 'video') {
+				FramerVideo.destroy();
+			}
+			
+			if(!$.isEmptyObject(settings.inner)) {
+				$(settings.inner).remove();
+			}
+			
+			if(FRM.title) {
+				FRM.title.remove();
+			}
+			if(FRM.description) {
+				FRM.description.remove();
+			}
+
+			FRM.closeBtn.remove();
+			if(FRM.type != 'inline') {
+				FRM.contents.remove();
+			}
+
+			if(settings.isCSSAnim) {
+				FRM.container.remove();
+			}
+
+			FRM.box.remove();
+			overlay.remove();
+
+			if(settings.isPushState && isMove) {
+				window.history.back();
+			}
+			
+			FRM.body.trigger('close.Framer');
 		}
 		
 		
@@ -230,9 +254,16 @@
 				showContentsComplete();
 			}
 			else {
-				FRM.box.fadeIn(settings.speed, function() {
-					showContentsComplete();
-				});
+				if(settings.isCSSAnim) {
+					FRM.box.css({
+						"display": "block"
+					}).addClass('show').delay(settings.speed, showContentsComplete);
+				}
+				else {
+					FRM.box.fadeIn(settings.speed, function() {
+						showContentsComplete();
+					});
+				}
 			}
 		}
 		
@@ -252,7 +283,7 @@
 					}
 					//console.log('video: ', FRM.contents.width(), FRM.contents.height());
 					FramerVideo.width(FRM.contents.width() || FRM.target.attr('data-framer-width') || settings.width);
-				    FramerVideo.height(FRM.contents.height() || FRM.target.attr('data-framer-height') || settings.height);
+					FramerVideo.height(FRM.contents.height() || FRM.target.attr('data-framer-height') || settings.height);
 				}
 			}
 			
@@ -266,16 +297,33 @@
 				FRM.closeBtn.on("click", $.Framer.close);
 			}
 
+			// pushState
+			if(settings.isPushState) {
+				if(FRM.target.attr('data-framer-ps') != null) {
+					window.history.pushState(FRM.target.attr('data-framer-ps'), "", FRM.target.attr('data-framer-ps'));
+					isMove = true;
+				}
+			}
+
 			FRM.body.trigger('open.Framer');
 		}
 		
 		
 		var getPosition = function() {
-			$(window).height()
-			FRM.box.css({
-				top: Math.floor(($(window).height() - FRM.box.outerHeight()) * 0.5) + $(window).scrollTop(),
-				left: Math.floor(($(window).width() - FRM.box.outerWidth()) * 0.5)
-			})
+			// $(window).height();
+
+			if(settings.isCSSAnim) {
+				FRM.container.css({
+					top: Math.floor(($(window).height() - FRM.box.outerHeight()) * 0.5) + $(window).scrollTop(),
+					left: Math.floor(($(window).width() - FRM.box.outerWidth()) * 0.5)
+				});
+			}
+			else {
+				FRM.box.css({
+					top: Math.floor(($(window).height() - FRM.box.outerHeight()) * 0.5) + $(window).scrollTop(),
+					left: Math.floor(($(window).width() - FRM.box.outerWidth()) * 0.5)
+				});
+			}
 		}
 
 
@@ -304,7 +352,15 @@
 			}
 
 			FRM.box.append(FRM.contents);
-			FRM.body.append(FRM.box);
+
+			if(settings.isCSSAnim) {
+				FRM.container = $('<div id="framerContainer" />');
+				FRM.container.append(FRM.box);
+				FRM.body.append(FRM.container);
+			}
+			else {
+				FRM.body.append(FRM.box);
+			}
 
 			var edbw = FRM.box.outerWidth();
 			var edbh = FRM.box.outerHeight();
@@ -428,18 +484,18 @@
 					height: FRM.target.attr('data-framer-height') || settings.height
 				});
 			}
+
+			if(settings.isCSSAnim) {
+				FRM.container.width(FRM.box.outerWidth()).height(FRM.box.outerHeight());
+			}
 		}
 		
 		
 		var FramerResize = function(e) {
-			overlay.height($(window).height())
-			overlay.height($(document).height()).width($(window).width());
+			overlay.height($(window).height());
+			overlay.width($(window).width());
 			
-			FRM.box.stop().animate({
-				top: Math.floor(($(window).height() - FRM.box.outerHeight()) * 0.5) + $(window).scrollTop(),
-				left: Math.floor(($(window).width() - FRM.box.outerWidth()) * 0.5)
-			},
-			settings.speed);
+			scrollCompleteEvent();
 		}
 		
 		
@@ -454,7 +510,16 @@
 		}
 		
 		var scrollCompleteEvent = function() {
-			FRM.box.stop().animate({
+			var moveTarget;
+
+			if(settings.isCSSAnim) {
+				moveTarget = FRM.container;
+			}
+			else {
+				moveTarget = FRM.box;
+			}
+
+			moveTarget.stop().animate({
 				top: Math.floor(($(window).height() - FRM.box.outerHeight()) * 0.5) + $(window).scrollTop(),
 				left: Math.floor(($(window).width() - FRM.box.outerWidth()) * 0.5)
 			},
@@ -610,6 +675,20 @@
 			return vars;
 		}
 
+		var getState = function() {
+			var url = location.href;
+			var ary = url.split("/");
+
+			var str = ary[ary.length - 1];
+
+			if(str.match(/.html$/)) {
+				return ary[ary.length - 2];
+			}
+			else {
+				return str;
+			}
+		}
+
 
 		var getImageSize = function(img) {
 			var w, h;
@@ -658,6 +737,21 @@
 			else {
 				return false;
 			}
+		}
+
+		var changeStateEvent = function(e) {
+			// console.log("changeStateEvent", e);
+			var state = e.originalEvent.state;
+			// console.log("popstate : ", e.originalEvent.state, isMove);
+			if(state == null && isMove == true) {
+				// console.log("ismove");
+				$.Framer.close();
+			}
+		}
+
+		if(settings.isPushState) {
+			// console.log("isPushState");
+			$(window).on("popstate", $.proxy(changeStateEvent, this));
 		}
 		
 		this.on('click.Framer', $.Framer.open);

@@ -9,11 +9,27 @@ div#frm_overlay {
 	opacity: 0;
 	-webkit-transform: translate3d(0, 0, 0);
 }
+div#framerContainer {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: 9000;
+}
 div#framer {
 	position: absolute;
 	display: none;
 	z-index: 9000;
 	background-color: #fff;
+
+/*	
+	only CSS Animation
+	-webkit-transition: -webkit-transform 0.5s;
+	-moz-transition: -moz-transform 0.5s;
+	transition: transform 0.5s;*/
+}
+div#framer.show {
+/*	only CSS Animation*/
+	opacity: 1;
 }
 
 div#framer img {
