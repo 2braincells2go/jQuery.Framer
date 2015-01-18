@@ -609,7 +609,7 @@
 			
 			var youtube = $('<iframe frameborder="0"></iframe>');
 			youtube.attr({
-				src: "http://www.youtube.com/embed/" + movieId,
+				src: "http://www.youtube.com/embed/" + movieId + '?wmode=opaque',
 				width: FRM.target.attr('data-framer-width') || settings.width,
 				height: FRM.target.attr('data-framer-height') || settings.height
 			});
