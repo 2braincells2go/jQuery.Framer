@@ -1,0 +1,6 @@
+div#framer img {
+  position: relative;
+}
+div#framer .close_btn {
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#CC000000,endColorstr=#CC000000);
+}

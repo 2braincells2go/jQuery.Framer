@@ -1,15 +1,15 @@
-/* ------------------------------------------------------------------------
-	jQuery Framer Plugin
-
-	Author: Hirohisa Nagai
-	Copyright: eternity design ( http://eternitydesign.net/ )
-	Version: 0.60
-	License: MIT License
-	
-	include spin.js
-	fgnass.github.com/spin.js#v2.0.1
-
-------------------------------------------------------------------------- */
+/**
+ * jQuery Framer Plugin
+ *
+ * @author		Hirohisa Nagai
+ * @version		0.80
+ * @copyright	eternity design ( http://eternitydesign.net/ )
+ * @license		MIT License
+ *
+ * include spin.js
+ * fgnass.github.com/spin.js#v2.0.1
+ *
+ */
 
 (function($) {
 	var FRM = $.Framer = {};
@@ -158,6 +158,9 @@
 			else if(FRM.type == 'soundcloud') {
 				FRM.contents = getSCContents();
 			}
+			else if(FRM.type == 'twitch') {
+				FRM.contents = getTwitchContents();
+			}
 			else if(FRM.type == 'iframe') {
 				FRM.contents = getiFrameContents();
 			}
@@ -179,7 +182,7 @@
 			}
 
 			return false;
-		}
+		};
 		
 		
 		FRM.close = function() {
@@ -207,7 +210,7 @@
 			else {
 				FRM.box.fadeOut(settings.speed, destroyBox);
 			}
-		}
+		};
 
 
 		var destroyBox = function() {
@@ -247,7 +250,7 @@
 			}
 			
 			FRM.body.trigger('close.Framer');
-		}
+		};
 		
 		
 		var showContents = function() {
@@ -262,12 +265,12 @@
 				FRM.closeBtn = $(settings.closeBtn);
 			}
 			
-			if(isIE8()) {
-				// console.log('isIE8');
-				FRM.box.show();
-				showContentsComplete();
-			}
-			else {
+			// if(isIE8()) {
+			// 	// console.log('isIE8');
+			// 	FRM.box.show();
+			// 	showContentsComplete();
+			// }
+			// else {
 				if(settings.isCSSAnim) {
 					FRM.box.css({
 						"display": "block"
@@ -278,8 +281,8 @@
 						showContentsComplete();
 					});
 				}
-			}
-		}
+			// }
+		};
 		
 		
 		var showContentsComplete = function() {
@@ -321,7 +324,7 @@
 			}
 
 			FRM.body.trigger('open.Framer');
-		}
+		};
 		
 		
 		var getPosition = function() {
@@ -339,7 +342,7 @@
 					left: Math.floor(($(window).width() - FRM.box.outerWidth()) * 0.5)
 				});
 			}
-		}
+		};
 
 
 		var setBoxSize = function() {
@@ -391,7 +394,7 @@
 			
 			var innerHeight = FRM.box.height() - ch;
 			
-			//console.log(cw + ' : ', ch + ' : ', edbw + ' : ', edbh + ' : ', ww + ' : ', wh + ' : ', emw + ' : ', emh + ' : ', mw + ' : ', mh);
+			// console.log(cw + ' : ', ch + ' : ', edbw + ' : ', edbh + ' : ', ww + ' : ', wh + ' : ', emw + ' : ', emh + ' : ', mw + ' : ', mh);
 			
 			var ratio;
 			
@@ -431,6 +434,8 @@
 							FRM.box.width(cw);
 						}
 					}
+
+					console.log("FRM.box.height()", FRM.box.height(), ch, FRM.box);
 					
 					if(FRM.box.height() < ch) {
 						if(FRM.box.height() > 0) {
@@ -503,15 +508,14 @@
 			if(settings.isCSSAnim) {
 				FRM.container.width(FRM.box.outerWidth()).height(FRM.box.outerHeight());
 			}
-		}
+		};
 		
 		
 		var FramerResize = function(e) {
-			overlay.height($(window).height());
-			overlay.width($(window).width());
-			
+			overlay.height($(document).height()).width($(window).width());
+
 			scrollCompleteEvent();
-		}
+		};
 		
 		
 		var scrollEvent = function() {
@@ -522,7 +526,7 @@
 				scrollTimer = null;
 				$(window).trigger('scrollComplete.Framer');
 			}, 500);
-		}
+		};
 		
 		var scrollCompleteEvent = function() {
 			var moveTarget;
@@ -539,7 +543,7 @@
 				left: Math.floor(($(window).width() - FRM.box.outerWidth()) * 0.5)
 			},
 			settings.speed);
-		}
+		};
 		
 		
 		var getType = function(url, type) {
@@ -551,6 +555,9 @@
 			}
 			else if(url.match(/soundcloud\.com/i) || type == 'soundcloud') {
 				return "soundcloud";
+			}
+			else if(url.match(/twitch\.tv/i) || type == 'twitch') {
+				return "twitch";
 			}
 			else if(url.substr(0, 1) == '#' || type == 'inline') {
 				return "inline";
@@ -567,12 +574,12 @@
 			else if(url.match(/\.(gif|jpg|jpeg|png)$/i) || type == 'image') {
 				return "image";
 			}
-		}
+		};
 		
 		
 		var getInlineContents = function() {
 			return $(FRM.target.attr('href')).show();
-		}
+		};
 		
 		
 		var getVideoJSContents = function() {
@@ -600,7 +607,7 @@
 			}
 
 			return video;
-		}
+		};
 
 
 		var getYoutubeContents = function() {
@@ -615,7 +622,7 @@
 			});
 			
 			return youtube;
-		}
+		};
 
 
 		var getVimeoContents = function() {
@@ -632,7 +639,50 @@
 			});
 			
 			return vimeo;
-		}
+		};
+
+
+		var getTwitchContents = function() {
+			// <object bgcolor="#000000" data="http://www.twitch.tv/swflibs/TwitchPlayer.swf" height="378" id="clip_embed_player_flash" type="application/x-shockwave-flash" width="620"><param name="movie" value="http://www.twitch.tv/swflibs/TwitchPlayer.swf" /><param name="allowScriptAccess" value="always" /><param name="allowNetworking" value="all" /><param name="allowFullScreen" value="true" /><param name="flashvars" value="channel=assassinscreed&auto_play=false&start_volume=25&videoId=v3778016&device_id=65b095e38ed0b7d9" /></object><br /><a href="http://www.twitch.tv/assassinscreed" style="padding:2px 0px 4px; display:block; width: 320px; font-weight:normal; font-size:10px; text-decoration:underline;">Watch live video from AssassinsCreed on Twitch</a>
+			// <iframe src="http://www.twitch.tv/singi751014/embed" frameborder="0" scrolling="no" height="378" width="620"></iframe><a href="http://www.twitch.tv/singi751014?tt_medium=live_embed&tt_content=text_link" style="padding:2px 0px 4px; display:block; width:345px; font-weight:normal; font-size:10px;text-decoration:underline;">Watch live video from singi751014 on www.twitch.tv</a>
+			console.log("getTwitchContents");
+
+			var twitch;
+			var isLive = true;
+			if(FRM.target.attr('href').match(/\/[a-z]{1}\/[0-9]+$/i)) {
+				isLive = false;
+			}
+
+			console.log(isLive);
+
+			// ライブプレイヤーの場合
+			if(isLive) {
+				var twitch = $('<iframe frameborder="0" scrolling="no"></iframe>');
+				twitch.attr({
+					src: FRM.target.attr('href') + '/embed',
+					width: FRM.target.attr('data-framer-width') || 620,
+					height: FRM.target.attr('data-framer-height') || 378
+				});
+			}
+			else {
+				var regx = FRM.target.attr('href').match(/twitch\.tv\/([^#\&\?\/]*)\/v\/([0-9]*)/i);
+				var channel = regx[1];
+				var videoId = regx[2];
+				var twitch = $('<object bgcolor="#000000" data="http://www.twitch.tv/swflibs/TwitchPlayer.swf" id="clip_embed_player_flash" type="application/x-shockwave-flash"></object>');
+				var params = '<param name="movie" value="http://www.twitch.tv/swflibs/TwitchPlayer.swf" /><param name="allowScriptAccess" value="always" /><param name="allowNetworking" value="all" /><param name="allowFullScreen" value="true" /><param name="flashvars" value="channel=%channel%&auto_play=false&start_volume=25&videoId=v%videoId%&device_id=65b095e38ed0b7d9" />';
+				params = params.replace("%channel%", channel);
+				params = params.replace("%videoId%", videoId);
+
+				twitch.attr({
+					width: FRM.target.attr('data-framer-width') || 620,
+					height: FRM.target.attr('data-framer-height') || 378
+				});
+
+				twitch.append(params);
+			}
+
+			return twitch;
+		};
 
 
 		var getSCContents = function() {
@@ -646,7 +696,7 @@
 			});
 			
 			return soundcloud;
-		}
+		};
 
 
 		var getiFrameContents = function() {
@@ -658,7 +708,7 @@
 			});
 			
 			return iframe;
-		}
+		};
 
 
 		var getAjaxContents = function() {
@@ -675,7 +725,7 @@
 					showContents();
 				}
 			});
-		}
+		};
 
 
 		var getUrlParams = function(src) {
@@ -688,7 +738,7 @@
 			}
 
 			return vars;
-		}
+		};
 
 		var getState = function() {
 			var url = location.href;
@@ -702,7 +752,7 @@
 			else {
 				return str;
 			}
-		}
+		};
 
 
 		var getImageSize = function(img) {
@@ -724,7 +774,7 @@
 			}
 
 			return {width: w, height: h};
-		}
+		};
 
 
 		var isIE = function() {
@@ -737,7 +787,7 @@
 			else {
 				return false;
 			}
-		}
+		};
 
 
 		var isIE8 = function() {
@@ -752,7 +802,7 @@
 			else {
 				return false;
 			}
-		}
+		};
 
 		var changeStateEvent = function(e) {
 			// console.log("changeStateEvent", e);
@@ -762,7 +812,7 @@
 				// console.log("ismove");
 				$.Framer.close();
 			}
-		}
+		};
 
 		if(settings.isPushState) {
 			// console.log("isPushState");
@@ -772,7 +822,7 @@
 		this.on('click.Framer', $.Framer.open);
 		
 		return this;
-	}
+	};
 })(jQuery);
 
 

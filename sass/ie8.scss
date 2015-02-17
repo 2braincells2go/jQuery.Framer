@@ -1,0 +1,12 @@
+@import "compass";
+
+
+div#framer {
+	img {
+		position: relative;
+	}
+
+	.close_btn {
+		filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#CC000000,endColorstr=#CC000000);
+	}
+}
