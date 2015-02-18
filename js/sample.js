@@ -1,5 +1,7 @@
 $(function(){
-	$('.framer').Framer();
+	$('.framer').Framer({
+		blur: "#wrap"
+	});
 
 	// $('.ps_framer').Framer({
 	// 	isPushState: true

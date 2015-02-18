@@ -33,6 +33,7 @@
 			height: 360,
 			iframe: '<iframe name="framer-iframe" frameborder="0" id="framer-iframe"></iframe>',
 			ajaxDataType: 'html',
+			blur: '',
 			isPushState: false,
 			isCSSAnim: false
 		}, settings);
@@ -48,6 +49,7 @@
 		FRM.description;
 		FRM.closeBtn;
 		FRM.container = null;
+		FRM.blurTarget;
 
 		var loading;
 		var overlay;
@@ -85,6 +87,19 @@
 			
 			FRM.body.append(overlay);
 			overlay.fadeTo(settings.overlayTime, settings.opacity);
+
+			// Blur
+			if(settings.blur !== '') {
+				console.log(settings.blur);
+				FRM.blurTarget = $(settings.blur).Vague({
+					intensity: 8,
+					animationOptions: {
+						duration: settings.speed,
+						easing: 'linear'
+					}
+				});
+				FRM.blurTarget.blur();
+			}
 			
 			FRM.box = $('<div id="framer"></div>');
 
@@ -202,6 +217,9 @@
 				FRM.closeBtn.fadeOut(settings.speed);
 			}
 			overlay.fadeOut(settings.overlayTime);
+			if(settings.blur !== '') {
+				FRM.blurTarget.unblur();
+			}
 
 			if(settings.isCSSAnim) {
 				FRM.box.removeClass('show');
