@@ -117,7 +117,7 @@ section h2 {
   border-bottom: 1px solid #d8dde6;
 }
 section h3 {
-  margin-top: 40px;
+  margin: 0;
   font-size: 18px;
   font-weight: 100;
   margin-bottom: 20px;
@@ -126,6 +126,16 @@ section h3 {
 section h3 span {
   font-size: 11px;
   font-weight: 300;
+}
+section .options {
+  margin: 40px 0;
+}
+section .options:last-child {
+  margin-bottom: 0;
+}
+section dl {
+  margin: 0 0 -20px;
+  overflow: hidden;
 }
 section dt {
   width: 156px;
@@ -149,12 +159,11 @@ section dd {
 div#inline_sample,
 #api_contents {
   display: none;
-  width: 300px;
-  height: 150px;
+  width: 800px;
+  height: 500px;
   color: #787878;
   background-color: #fff;
   padding: 50px;
-  border: 5px solid #e6e6e6;
 }
 
 section#ajaxContents {
@@ -162,6 +171,7 @@ section#ajaxContents {
   height: 300px;
   padding: 30px;
   margin: 0;
+  background-color: #fff;
 }
 
 code, pre {

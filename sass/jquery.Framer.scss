@@ -20,21 +20,25 @@ div#frm_overlay {
 	position: absolute;
 	top: 0;
 	width: 100%;
-	z-index: 5000;
+	z-index: 1999;
 	opacity: 0;
 	-webkit-transform: translate3d(0, 0, 0);
 }
-div#framerContainer {
-	position: absolute;
-	top: 0px;
-	left: 0px;
-	z-index: 9000;
-}
+
 div#framer {
 	position: absolute;
 	display: none;
-	z-index: 9000;
-	background-color: #fff;
+	z-index: 2000;
+
+	#framerContainer {
+		position: relative;
+		background-color: #000;
+		padding: 0;
+	}
+
+	&.anim_base {
+		@include backface-visibility(hidden);
+	}
 
 	// only CSS Animation
 	// -webkit-transition: -webkit-transform 0.5s;
@@ -73,7 +77,7 @@ div#framer {
 		top: -14px;
 		display: none;
 		cursor: pointer;
-		z-index: 8000;
+		z-index: 2001;
 		color: #fff;
 		background-color: rgba(0, 0, 0, 0.8);
 		@include border-radius(50%);
@@ -105,13 +109,76 @@ div#framer {
 		// 	box-shadow: inset 0 0 0 35px rgba(0, 0, 0, 0);
 		// }
 	}
+
+	// CSS Animation - Nifty Modal Window Effects ( http://tympanus.net/Development/ModalWindowEffects/ )
+	&.fade_in_scale {
+
+		#framerContainer {
+			@include transform(scale(0.7));
+			opacity: 0;
+		}
+
+		&.show {
+			#framerContainer {
+				@include transform(scale(1.0));
+				opacity: 1;
+			}
+		}
+	}
+
+	&.slide_in_right {
+		#framerContainer {
+			@include transform(translateX(20%));
+			@include transition-timing-function(cubic-bezier(0.25, 0.5, 0.5, 0.9));
+			opacity: 0;
+		}
+
+		&.show {
+			#framerContainer {
+				@include transform(translateX(0));
+				opacity: 1;
+			}
+		}
+	}
+
+	&.slide_in_bottom {
+		#framerContainer {
+			@include transform(translateY(20%));
+			opacity: 0;
+		}
+
+		&.show {
+			#framerContainer {
+				@include transform(translateY(0));
+				opacity: 1;
+			}
+		}
+	}
+
+	&.sign_3d {
+		@include perspective(1300px);
+
+		#framerContainer {
+			@include transform-style(preserve-3d);
+			@include transform(rotateX(-60deg));
+			@include transform-origin(50%, 0, 0);
+			opacity: 0;
+		}
+
+		&.show {
+			#framerContainer {
+				@include transform(rotateX(0deg));
+				opacity: 1;
+			}
+		}
+	}
 }
 
 div#loading {
 	width: 100%;
 	height: 100%;
 	position: absolute;
-	z-index: 5100;
+	z-index: 2000;
 	top: 0;
 	left: 0;
 }
@@ -141,6 +208,17 @@ div#framer_inner {
 	width: 100%;
 	height: 30px;
 	background-color: #000;
+}
+
+div#framer_error {
+	width: 300px;
+	min-height: 18px;
+	background-color: #eb4c2d;
+	font-size: 18px;
+	line-height: 18px;
+	color: #fff;
+	padding: 6px;
+	text-align: center;
 }
 
 video {

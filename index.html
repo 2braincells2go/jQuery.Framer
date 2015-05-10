@@ -73,8 +73,7 @@
 				<img src="http://pics.campl.us/iphone/5/5b77323b02e9d7d4bdae0b12508b8207.jpg" style="width: 240px; height: 179px;" />
 				</a>
 			</section>
-	
-	
+
 			<section id="inline">
 				<h2>Inline Contents</h2>
 				<a href="#inline_sample" class="framer btn" title="Inline Contents Sample" data-framer-description="inline content description">
@@ -84,7 +83,7 @@
 				&lt;a href="#inline_sample" class="framer" title="Inline Contents Sample" data-framer-description="inline content description"&gt;Inline Contents Sample&lt;/a&gt;
 				</code>
 			</section>
-	
+
 			<section id="video">
 				<h2>Video (<a href="http://videojs.com/" target="_blank">Video.js</a> - HTML5 Video & Flash Video)</h2>
 				<a href="http://video-js.zencoder.com/oceans-clip" class="framer btn" data-framer-type="video" data-framer-width="640" data-framer-height="264" data-framer-video-class="video-js vjs-default-skin" data-framer-video-setup='{"controls": true, "autoplay": false, "preload": "auto", "poster": "http://video-js.zencoder.com/oceans-clip.png"}'>
@@ -96,8 +95,7 @@
 				Movie
 				&lt;/a&gt;
 				</code>
-	
-	
+
 				<div class="options">
 					<h3>必須属性 <span>REQUIREATTRIBUTES</span></h3>
 					<dl>
@@ -114,14 +112,13 @@
 					</dl>
 				<!-- /.options --></div>
 			</section>
-	
-	
+
 			<section id="media">
 				<h2>Media</h2>
-				<a href="http://www.youtube.com/watch?v=6TtGqQtChxw" class="framer btn" data-framer-width="560" data-framer-height="315">YouTube</a>
+				<a href="http://youtu.be/0q-zIsiQSvA" class="framer btn" data-framer-width="853" data-framer-height="480" data-youtube-option="vq=highres">YouTube</a>
 				<a href="http://vimeo.com/62930885" class="framer btn">Vimeo</a>
-				<a href="https://soundcloud.com/bt/bt-skylarking" class="framer btn">SoundCloud</a>
-				<a href="http://www.twitch.tv/assassinscreed/v/3778016" class="framer btn">Twitch</a>
+				<a href="https://soundcloud.com/hybridsoundsystem/hybrid-album-five-teaser" class="framer btn">SoundCloud</a>
+				<a href="http://www.twitch.tv/assassinscreed/v/3778016" data-framer-width="806" data-framer-height="491" class="framer btn">Twitch</a>
 				<code class="prettyprint lang-html">
 				&lt;a href="http://www.youtube.com/watch?v=6TtGqQtChxw" class="framer" data-framer-width="560" data-framer-height="315"&gt;YouTube&lt;/a&gt;
 				</code>
@@ -133,6 +130,14 @@
 						--><dd>動画のwidth</dd>
 						<dt>data-framer-height</dt><!--
 						--><dd>動画のheight <small>※ SoundCloudは、166pxに固定されます。</small></dd>
+					</dl>
+				<!-- /.options --></div>
+
+				<div class="options">
+					<h3>オプション属性 <span>OPTIONATTRIBUTES</span></h3>
+					<dl>
+						<dt>data-youtube-option</dt><!--
+						--><dd>YouTubeのオプション。パラメータで指定する。 ex: vq=highres</dd>
 					</dl>
 				<!-- /.options --></div>
 			</section>
@@ -160,16 +165,36 @@
 			<section id="ajax">
 				<h2>Ajax</h2>
 				<a href="ajax.html" class="framer btn" data-framer-type="ajax">Ajax Contents Sample</a>
+				<a href="ajax2.html" class="framer btn" data-framer-type="ajax">Ajax Contents Error Sample</a>
 				<code class="prettyprint lang-html">
 				&lt;a href="ajax.html" class="framer" data-framer-type="ajax"&gt;Ajax Contents&lt;/a&gt;
 				</code>
 		
 				<div class="options">
-				<h3>必須属性 <span>REQUIREATTRIBUTES</span></h3>
-				<dl>
-				<dt>data-framer-type</dt><!--
-				--><dd>"ajax"</dd>
-				</dl>
+					<h3>必須属性 <span>REQUIREATTRIBUTES</span></h3>
+					<dl>
+					<dt>data-framer-type</dt><!--
+					--><dd>"ajax"</dd>
+					</dl>
+				<!-- /.options --></div>
+			</section>
+
+			<section id="css_anim">
+				<h2>CSS Animation</h2>
+				<a href="http://pics.campl.us/f/2/2e45a63ff9bc6459c82eaea4aa8fa5bc.jpg" class="framer btn" data-framer-animation="fade_in_scale">fade_in_scale</a>
+				<a href="http://pics.campl.us/iphone/2/28951.d83db93a5b6e8b75c5bec34dc3c25f57.jpg" class="framer btn" data-framer-animation="slide_in_right">slide_in_right</a>
+				<a href="http://pics.campl.us/iphone/2/28951.d83db93a5b6e8b75c5bec34dc3c25f57.jpg" class="framer btn" data-framer-animation="slide_in_bottom">slide_in_bottom</a>
+				<a href="http://pics.campl.us/f/2/2e45a63ff9bc6459c82eaea4aa8fa5bc.jpg" class="framer btn" data-framer-animation="sign_3d">sign_3d</a>
+				<code class="prettyprint lang-html">
+				&lt;a href="ajax.html" class="framer" data-framer-type="ajax"&gt;Ajax Contents&lt;/a&gt;
+				</code>
+		
+				<div class="options">
+					<h3>必須属性 <span>REQUIREATTRIBUTES</span></h3>
+					<dl>
+					<dt>data-framer-type</dt><!--
+					--><dd>"ajax"</dd>
+					</dl>
 				<!-- /.options --></div>
 			</section>
 	

@@ -7,16 +7,17 @@
  * @license		MIT License
  *
  * include spin.js
- * fgnass.github.com/spin.js#v2.0.1
+ * fgnass.github.com/spin.js#v2.1.0
  *
  */
 
 (function($) {
 	var FRM = $.Framer = {};
-	
-	
+
+
 	$.fn.Framer = function(settings) {
 		settings = $.extend({
+			animation: "fade",
 			loadingColor: '#fff',
 			opacity: 0.8,
 			overlayTime: 500,
@@ -48,8 +49,9 @@
 		FRM.title;
 		FRM.description;
 		FRM.closeBtn;
-		FRM.container = null;
+		FRM.container;
 		FRM.blurTarget;
+		FRM.animation;
 
 		var loading;
 		var overlay;
@@ -73,24 +75,21 @@
 				top: $(window).scrollTop(),
 				left: 0
 			});
-			
+
 			var loading_options = {
 				lines: 12,
 				width: 4,
-				color: settings.loadingColor,
-				top: $(window).height() * 0.5,
-				left: $(window).width() * 0.5
+				color: settings.loadingColor
 			};
 
 			FRM.indicator = new Spinner(loading_options).spin(loading[0]);
 			FRM.body.append(loading);
-			
+
 			FRM.body.append(overlay);
 			overlay.fadeTo(settings.overlayTime, settings.opacity);
 
 			// Blur
 			if(settings.blur !== '') {
-				console.log(settings.blur);
 				FRM.blurTarget = $(settings.blur).Vague({
 					intensity: 8,
 					animationOptions: {
@@ -102,6 +101,8 @@
 			}
 			
 			FRM.box = $('<div id="framer"></div>');
+			FRM.container = $('<div id="framerContainer" />');
+			FRM.box.append(FRM.container);
 
 			if(arguments.length > 1) {
 				// API call
@@ -117,7 +118,16 @@
 			else {
 				FRM.target = $(this);
 			}
-			
+
+			FRM.animation = FRM.target.attr('data-framer-animation') || settings.animation;
+
+			if(FRM.animation !== "fade") {
+				FRM.container.css({
+					"transition-duration": String(settings.speed * 0.001) + "s"
+				});
+				FRM.box.addClass(FRM.animation);
+			}
+
 			if(!$.isEmptyObject(settings.inner)) {
 				FRM.box.append(settings.inner);
 			}
@@ -131,7 +141,7 @@
 						FRM.title = $(settings.title).text(FRM.target.attr('title'));
 					}
 
-					FRM.box.append(FRM.title);
+					FRM.container.append(FRM.title);
 				}
 			}
 
@@ -144,7 +154,7 @@
 						FRM.description = $(settings.description).text(FRM.target.attr('data-framer-description'));
 					}
 
-					FRM.box.append(FRM.description);
+					FRM.container.append(FRM.description);
 				}
 			}
 
@@ -152,7 +162,9 @@
 
 			if(FRM.type == 'image') {
 				FRM.contents = $("<img />").on("load", function() {
-					showContents();
+					loadImageComplete();
+					// FRM.contents = setBoxSize(FRM.contents);
+					// showContents();
 				}).on("error", function() {
 					//console.log("error", settings.resources[key][0]);
 				});
@@ -189,7 +201,7 @@
 			
 			FRM.box.addClass(FRM.type);
 			
-			$(window).on('resize.Framer', FramerResize);
+			$(window).on('resize.Framer', resizeFramer);
 			
 			if(settings.isScroll) {
 				$(window).on('scroll.Framer', scrollEvent);
@@ -198,11 +210,12 @@
 
 			return false;
 		};
-		
-		
+
+
 		FRM.close = function() {
-			$(window).off('resize.Framer', FramerResize);
-			
+			$(window).off('resize.Framer', resizeFramer);
+			FRM.closeBtn.off("click", $.Framer.close);
+
 			if(settings.isScroll) {
 				$(window).off('scroll.Framer', scrollEvent);
 				$(window).off('scrollComplete.Framer', scrollCompleteEvent);
@@ -211,19 +224,20 @@
 			if(settings.isOverlayClose) {
 				overlay.off("click", $.Framer.close);
 			}
-			FRM.closeBtn.off("click", $.Framer.close);
 
 			if(settings.closeBtn != '') {
 				FRM.closeBtn.fadeOut(settings.speed);
 			}
 			overlay.fadeOut(settings.overlayTime);
+
 			if(settings.blur !== '') {
 				FRM.blurTarget.unblur();
 			}
 
-			if(settings.isCSSAnim) {
+			if(FRM.animation !== "fade") {
+				FRM.container.on("transitionend webkitTransitionEnd", destroyBox);
 				FRM.box.removeClass('show');
-				setTimeout(destroyBox, settings.speed);
+				// setTimeout(destroyBox, settings.speed);
 			}
 			else {
 				FRM.box.fadeOut(settings.speed, destroyBox);
@@ -232,6 +246,11 @@
 
 
 		var destroyBox = function() {
+			if(FRM.animation !== "fade") {
+				FRM.container.off("transitionend webkitTransitionEnd", destroyBox);
+				FRM.box.css({"display": "none"});
+			}
+
 			if(FRM.type == 'inline') {
 				FRM.contents.hide();
 				FRM.body.append(FRM.contents);
@@ -256,10 +275,7 @@
 				FRM.contents.remove();
 			}
 
-			if(settings.isCSSAnim) {
-				FRM.container.remove();
-			}
-
+			FRM.container.remove();
 			FRM.box.remove();
 			overlay.remove();
 
@@ -269,11 +285,19 @@
 			
 			FRM.body.trigger('close.Framer');
 		};
-		
-		
+
+
+		var loadImageComplete = function() {
+			FRM.contents = setBoxSize(FRM.contents);
+			showContents();
+		}
+
+
 		var showContents = function() {
-			setBoxSize();
-			getPosition();
+			FRM.container.append(FRM.contents);
+			FRM.body.append(FRM.box);
+
+			setPosition();
 			
 			FRM.indicator.stop();
 			loading.remove();
@@ -283,29 +307,30 @@
 				FRM.closeBtn = $(settings.closeBtn);
 			}
 			
-			// if(isIE8()) {
-			// 	// console.log('isIE8');
-			// 	FRM.box.show();
-			// 	showContentsComplete();
-			// }
-			// else {
-				if(settings.isCSSAnim) {
-					FRM.box.css({
-						"display": "block"
-					}).addClass('show').delay(settings.speed, showContentsComplete);
-				}
-				else {
-					FRM.box.fadeIn(settings.speed, function() {
-						showContentsComplete();
-					});
-				}
-			// }
+			if(FRM.animation !== "fade") {
+				// FRM.box.css({
+				// 	"display": "block"
+				// }).addClass('show').delay(settings.speed, showContentsComplete);
+				FRM.box.css({
+					"display": "block"
+				}).addClass('show');
+				FRM.container.on("transitionend webkitTransitionEnd", showContentsComplete);
+			}
+			else {
+				FRM.box.fadeIn(settings.speed, function() {
+					showContentsComplete();
+				});
+			}
 		};
-		
-		
+
+
 		var showContentsComplete = function() {
+			if(FRM.animation !== "fade") {
+				FRM.container.off("transitionend webkitTransitionEnd", showContentsComplete);
+			}
+
 			if(FRM.type == 'video') {
-				FramerVideo = _V_("Framer_video", $.parseJSON(FRM.target.attr('data-framer-video-setup')));
+				FramerVideo = _V_("framer_video", $.parseJSON(FRM.target.attr('data-framer-video-setup')));
 
 				if(isIE()) {
 					//console.log('noCloneEvent');
@@ -327,7 +352,7 @@
 			}
 			
 			if(settings.closeBtn != '') {
-				FRM.box.append(FRM.closeBtn);
+				FRM.container.append(FRM.closeBtn);
 				FRM.closeBtn.fadeIn(settings.speed);
 				FRM.closeBtn.on("click", $.Framer.close);
 			}
@@ -345,197 +370,176 @@
 		};
 		
 		
-		var getPosition = function() {
-			// $(window).height();
-
-			if(settings.isCSSAnim) {
-				FRM.container.css({
-					top: Math.floor(($(window).height() - FRM.box.outerHeight()) * 0.5) + $(window).scrollTop(),
-					left: Math.floor(($(window).width() - FRM.box.outerWidth()) * 0.5)
-				});
-			}
-			else {
-				FRM.box.css({
-					top: Math.floor(($(window).height() - FRM.box.outerHeight()) * 0.5) + $(window).scrollTop(),
-					left: Math.floor(($(window).width() - FRM.box.outerWidth()) * 0.5)
-				});
-			}
+		var setPosition = function() {
+			FRM.box.css({
+				top: Math.floor(($(window).height() - FRM.box.outerHeight()) * 0.5) + $(window).scrollTop(),
+				left: Math.floor(($(window).width() - FRM.box.outerWidth()) * 0.5)
+			});
 		};
 
+		// windowサイズから、#framerに利用可能なサイズを計算。設定
+		var setBoxSize = function(contents) {
+			var cw, ch, ratio;
 
-		var setBoxSize = function() {
-			var cw, ch;
-			if(FRM.type == 'image') {
+			if(FRM.type === "image") {
 				var is = getImageSize(FRM.contents[0]);
 
-				cw = FRM.target.attr('data-framer-width') || is.width;
-				ch = FRM.target.attr('data-framer-height') || is.height;
-				
-				if(FRM.target.attr('data-framer-width')) {
-					FRM.contents.width(FRM.target.attr('data-framer-width'));
-				}
-				if(FRM.target.attr('data-framer-height')) {
-					FRM.contents.height(FRM.target.attr('data-framer-height'));
-				}
+				cw = parseInt(FRM.target.attr('data-framer-width') || is.width);
+				ch = parseInt(FRM.target.attr('data-framer-height') || is.height);
 			}
-			else if (FRM.type == 'video' && !$.support.opacity) {
-				cw = FRM.target.attr('data-framer-width') || settings.width,
-				ch = FRM.target.attr('data-framer-height') || settings.height
+			else if(FRM.type === "soundcloud") {
+				cw = parseInt(FRM.target.attr('data-framer-width') || settings.width);
+				ch = 166;
 			}
-			else {
-				cw = FRM.target.attr('data-framer-width') || FRM.contents.outerWidth();
-				ch = FRM.target.attr('data-framer-height') || FRM.contents.outerHeight();
+			else if(FRM.type === "twitch") {
+				cw = parseInt(FRM.target.attr('data-framer-width') || 620);
+				ch = parseInt(FRM.target.attr('data-framer-height') || 378);
 			}
-
-			FRM.box.append(FRM.contents);
-
-			if(settings.isCSSAnim) {
-				FRM.container = $('<div id="framerContainer" />');
-				FRM.container.append(FRM.box);
-				FRM.body.append(FRM.container);
+			else if(FRM.type === "inline" || FRM.type === "ajax") {
+				cw = parseInt(FRM.target.attr('data-framer-width') || contents.outerWidth() || settings.width);
+				ch = parseInt(FRM.target.attr('data-framer-height') || contents.outerHeight() || settings.height);
 			}
 			else {
-				FRM.body.append(FRM.box);
+				cw = parseInt(FRM.target.attr('data-framer-width') || settings.width);
+				ch = parseInt(FRM.target.attr('data-framer-height') || settings.height);
 			}
 
-			var edbw = FRM.box.outerWidth();
-			var edbh = FRM.box.outerHeight();
+			// #framerContainer のborderとpaddingのサイズを取得する。この時点ではwidth、heightともに0なはずのなので・・・
+			var containerOuterWidth = FRM.container.outerWidth() === 0 ? FRM.container.outerWidth() : FRM.container.outerWidth() - FRM.container.width();
+			var containerOuterHeight = FRM.container.outerHeight() === 0 ? FRM.container.outerHeight() : FRM.container.outerHeight() - FRM.container.height();
+
+			// #framerContainerのpadding、border-sizeとコンテンツのサイズを足した数値。これが#framerのサイズとなるため、縮小する場合のベースの値となる
+			var targetWidth = containerOuterWidth === 0 ? cw + containerOuterWidth : containerOuterWidth - cw;
+			var targetHeight = containerOuterHeight === 0 ? ch + containerOuterHeight : containerOuterHeight - ch;
 
 			var ww = $(window).width();
 			var wh = $(window).height();
 
-			var emw = edbw - FRM.box.width();
-			var emh = edbh - FRM.box.height();
+			// var emw = containerOuterWidth - FRM.box.width();
+			// var emh = containerOuterHeight - FRM.box.height();
 
 			var mw = ww - cw;
 			var mh = wh - ch;
-			
+
 			var innerHeight = FRM.box.height() - ch;
 			
-			// console.log(cw + ' : ', ch + ' : ', edbw + ' : ', edbh + ' : ', ww + ' : ', wh + ' : ', emw + ' : ', emh + ' : ', mw + ' : ', mh);
-			
-			var ratio;
-			
+			// console.log("setMovieSize", cw, ch, containerOuterWidth, containerOuterHeight, ww, wh, mw, mh);
+
 			if(mw > mh) {	// 縦スペースが横スペースより小さい
-				if(wh * settings.resizeRatio < edbh) {
+				if(wh * settings.resizeRatio < targetHeight) {
 					// リサイズ処理
 					if(settings.isAutoResize) {
-						FRM.box.height(wh * settings.resizeRatio - emh);	// Framerへのpaddingを考慮に入れた数値
-						ratio = (FRM.box.height() - innerHeight) / ch;
-						FRM.box.width(cw * ratio);
-					
-						if(FRM.type != 'image' && cw != FRM.contents.width()) {
-							FRM.contents.width(FRM.box.width() - (cw - FRM.contents.width()));
-						}
-						else {
-							FRM.contents.width(FRM.box.width());
-						}
+						// console.log("hhhh", targetHeight);
+						// まずは一番親のコンテナとなる#framerのサイズを設定。この時、#framerContainerのpadding.border-sizeを含んだサイズ
+						FRM.box.height(wh * settings.resizeRatio);	// Framerへのpaddingを考慮に入れた数値
+						ratio = FRM.box.height() / targetHeight;
+						FRM.box.width(targetWidth * ratio);
 
-						if(FRM.type != 'image' && ch != FRM.contents.height()) {
-							FRM.contents.height(FRM.box.height() - (ch - FRM.contents.height()) - innerHeight);
-						}
-						else {
-							FRM.contents.height(FRM.box.height() - innerHeight);
-						}
+						// #framerに設定されたサイズから、#framerContainerのpadding、border-sizeを引いたサイズをコンテンツに設定
+						// contents.width(parseInt(FRM.box.width() - containerOuterWidth));
+						// contents.height(parseInt(FRM.box.height() - containerOuterHeight));
+						contents = setContentsSize(contents, parseInt(FRM.box.width() - containerOuterWidth), parseInt(FRM.box.height() - containerOuterHeight));
 					}
 				}
 				else {
-					if(FRM.type == 'image') {
-						FRM.contents.width(cw).height(ch);
-					}
+					FRM.box.width(targetWidth);
+					FRM.box.height(targetHeight);
 
-					if(FRM.box.width() < cw) {
-						if(FRM.box.width() > 0) {
-							FRM.box.width(parseInt(cw) + parseInt(FRM.box.width()));
-						}
-						else {
-							FRM.box.width(cw);
-						}
-					}
+					contents = setContentsSize(contents, cw, ch);
+					// contents.width(cw);
+					// contents.height(ch);
 
-					console.log("FRM.box.height()", FRM.box.height(), ch, FRM.box);
-					
-					if(FRM.box.height() < ch) {
-						if(FRM.box.height() > 0) {
-							// Framer以下の要素の高さを考慮
-							FRM.box.height(parseInt(ch) + parseInt(FRM.box.height()));
-						}
-						else {
-							FRM.box.height(ch);
-						}
-					}
+					// contents.attr({
+					// 	width: cw,
+					// 	height: ch
+					// });
 				}
 			}
 			else {	// 横スペースが縦より小さい
-				if(ww * settings.resizeRatio < edbw) {
+				if(ww * settings.resizeRatio < targetWidth) {
 					// リサイズ処理
 					if(settings.isAutoResize) {
-						FRM.box.width(ww * settings.resizeRatio - emw);
-						ratio = FRM.box.width() / cw;
-						FRM.box.height((ch * ratio) + innerHeight);
-					
-					
-						if(FRM.type != 'image' && cw != FRM.contents.width()) {
-							FRM.contents.width(FRM.box.width() - (cw - FRM.contents.width()));
-						}
-						else {
-							FRM.contents.width(FRM.box.width());
-						}
+						FRM.box.width(ww * settings.resizeRatio);
+						ratio = FRM.box.width() / targetWidth;
+						FRM.box.height(targetHeight * ratio);
 
-						if(FRM.type != 'image' && ch != FRM.contents.height()) {
-							FRM.contents.height(FRM.box.height() - (ch - FRM.contents.height()) - innerHeight);
-						}
-						else {
-							FRM.contents.height(FRM.box.height() - innerHeight);
-						}
-						
+						// #framerに設定されたサイズから、#framerContainerのpadding、border-sizeを引いたサイズをコンテンツに設定
+						// contents.attr({
+						// 	width: parseInt(FRM.box.width() - containerOuterWidth),
+						// 	height: parseInt(FRM.box.height() - containerOuterHeight)
+						// });
+						contents = setContentsSize(contents, parseInt(FRM.box.width() - containerOuterWidth), parseInt(FRM.box.height() - containerOuterHeight));
 					}
 				}
 				else {
-					if(FRM.type == 'image') {
-						FRM.contents.width(cw).height(ch);
-					}
+					FRM.box.width(targetWidth);
+					FRM.box.height(targetHeight);
 
-					if(FRM.box.width() < cw) {
-						if(FRM.box.width() > 0) {
-							FRM.box.width(parseInt(cw) + parseInt(FRM.box.width()));
-						}
-						else {
-							FRM.box.width(cw);
-						}
-					}
-					
-					if(FRM.box.height() < ch) {
-						if(FRM.box.height() > 0) {
-							FRM.box.height(parseInt(ch) + parseInt(FRM.box.height()));
-						}
-						else {
-							FRM.box.height(ch);
-						}
-					}
+					contents = setContentsSize(contents, cw, ch);
+
+					// contents.attr({
+					// 	width: cw,
+					// 	height: ch
+					// });
+				}
+			}
+
+			return contents;
+		};
+
+		var setContentsSize = function(contents, w, h) {
+			// 渡される値は、画面サイズから計算されたcontent部分に利用可能なサイズなので、ここでcontent自体に設定されているpadding、borderを引いたサイズを設定する。
+
+			var contentsWidth = contents.width();
+			var contentsHeight = contents.height();
+
+			if(contentsWidth === 0) {
+				// そもそもcontentsのサイズを取得できなかったら、パラメータの値そのまま設定する
+				contents.width(w);
+			}
+			else {
+				var pbWidth = contents.outerWidth() - contentsWidth;
+				if(pbWidth > 0) {
+					contents.width(w - pbWidth);
+				}
+				else {
+					contents.width(w);
 				}
 			}
 			
-			if(FRM.type == 'video') {
-				FRM.contents.attr({
-					width: FRM.target.attr('data-framer-width') || settings.width,
-					height: FRM.target.attr('data-framer-height') || settings.height
+			if(contentsHeight === 0) {
+				// そもそもcontentsのサイズを取得できなかったら、パラメータの値そのまま設定する
+				contents.height(h);
+			}
+			else {
+				var pbHeight = contents.outerHeight() - contentsHeight;
+				if(pbHeight > 0) {
+					contents.height(h - pbHeight);
+				}
+				else {
+					contents.height(h);
+				}
+			}
+
+			if(FRM.type === "video") {
+				// console.log("video", contents, contents.width());
+				contents.attr({
+					width: contents.width(),
+					height: contents.height()
 				});
 			}
 
-			if(settings.isCSSAnim) {
-				FRM.container.width(FRM.box.outerWidth()).height(FRM.box.outerHeight());
-			}
-		};
-		
-		
-		var FramerResize = function(e) {
+			return contents;
+		}
+
+
+		var resizeFramer = function(e) {
 			overlay.height($(document).height()).width($(window).width());
 
 			scrollCompleteEvent();
 		};
-		
-		
+
+
 		var scrollEvent = function() {
 			if(scrollTimer) {
 				clearTimeout(scrollTimer);
@@ -545,25 +549,19 @@
 				$(window).trigger('scrollComplete.Framer');
 			}, 500);
 		};
-		
+
+
 		var scrollCompleteEvent = function() {
-			var moveTarget;
+			FRM.contents = setBoxSize(FRM.contents);
 
-			if(settings.isCSSAnim) {
-				moveTarget = FRM.container;
-			}
-			else {
-				moveTarget = FRM.box;
-			}
-
-			moveTarget.stop().animate({
+			FRM.box.stop().animate({
 				top: Math.floor(($(window).height() - FRM.box.outerHeight()) * 0.5) + $(window).scrollTop(),
 				left: Math.floor(($(window).width() - FRM.box.outerWidth()) * 0.5)
 			},
 			settings.speed);
 		};
-		
-		
+
+
 		var getType = function(url, type) {
 			if(url.match(/youtube\.com\/watch/i) || url.match(/youtu\.be/i) || type == 'youtube') {
 				return "youtube";
@@ -593,19 +591,19 @@
 				return "image";
 			}
 		};
-		
-		
+
+
 		var getInlineContents = function() {
-			return $(FRM.target.attr('href')).show();
+			var inline = $(FRM.target.attr('href')).show();
+
+			inline = setBoxSize(inline);
+
+			return inline;
 		};
-		
-		
+
+
 		var getVideoJSContents = function() {
-			var video = $('<video id="Framer_video"></video>');
-			video.attr({
-				width: FRM.target.attr('data-framer-width') || settings.width,
-				height: FRM.target.attr('data-framer-height') || settings.height
-			});
+			var video = $('<video id="framer_video"></video>');
 			video.addClass(FRM.target.attr('data-framer-video-class'));
 			
 			var source = FRM.target.attr('href');
@@ -624,6 +622,8 @@
 				video.append('<source src="' + source + '.ogv" type="video/ogv" />');
 			}
 
+			video = setBoxSize(video);
+
 			return video;
 		};
 
@@ -633,12 +633,18 @@
 			var movieId = regx[3];
 			
 			var youtube = $('<iframe frameborder="0"></iframe>');
+
+			var option = "";
+			if(FRM.target.attr('data-youtube-option')) {
+				option = FRM.target.attr('data-youtube-option').replace(/^\?/, "");
+			}
+
 			youtube.attr({
-				src: "http://www.youtube.com/embed/" + movieId + '?wmode=opaque',
-				width: FRM.target.attr('data-framer-width') || settings.width,
-				height: FRM.target.attr('data-framer-height') || settings.height
+				src: "http://www.youtube.com/embed/" + movieId + '?wmode=opaque' + "&" + option
 			});
-			
+
+			youtube = setBoxSize(youtube);
+
 			return youtube;
 		};
 
@@ -651,11 +657,11 @@
 			
 			// <iframe src="http://player.vimeo.com/video/VIDEO_ID" width="WIDTH" height="HEIGHT" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
 			vimeo.attr({
-				src: "http://player.vimeo.com/video/" + movieId,
-				width: FRM.target.attr('data-framer-width') || settings.width,
-				height: FRM.target.attr('data-framer-height') || settings.height
+				src: "http://player.vimeo.com/video/" + movieId
 			});
-			
+
+			vimeo = setBoxSize(vimeo);
+
 			return vimeo;
 		};
 
@@ -663,7 +669,6 @@
 		var getTwitchContents = function() {
 			// <object bgcolor="#000000" data="http://www.twitch.tv/swflibs/TwitchPlayer.swf" height="378" id="clip_embed_player_flash" type="application/x-shockwave-flash" width="620"><param name="movie" value="http://www.twitch.tv/swflibs/TwitchPlayer.swf" /><param name="allowScriptAccess" value="always" /><param name="allowNetworking" value="all" /><param name="allowFullScreen" value="true" /><param name="flashvars" value="channel=assassinscreed&auto_play=false&start_volume=25&videoId=v3778016&device_id=65b095e38ed0b7d9" /></object><br /><a href="http://www.twitch.tv/assassinscreed" style="padding:2px 0px 4px; display:block; width: 320px; font-weight:normal; font-size:10px; text-decoration:underline;">Watch live video from AssassinsCreed on Twitch</a>
 			// <iframe src="http://www.twitch.tv/singi751014/embed" frameborder="0" scrolling="no" height="378" width="620"></iframe><a href="http://www.twitch.tv/singi751014?tt_medium=live_embed&tt_content=text_link" style="padding:2px 0px 4px; display:block; width:345px; font-weight:normal; font-size:10px;text-decoration:underline;">Watch live video from singi751014 on www.twitch.tv</a>
-			console.log("getTwitchContents");
 
 			var twitch;
 			var isLive = true;
@@ -671,16 +676,14 @@
 				isLive = false;
 			}
 
-			console.log(isLive);
-
 			// ライブプレイヤーの場合
 			if(isLive) {
 				var twitch = $('<iframe frameborder="0" scrolling="no"></iframe>');
 				twitch.attr({
-					src: FRM.target.attr('href') + '/embed',
-					width: FRM.target.attr('data-framer-width') || 620,
-					height: FRM.target.attr('data-framer-height') || 378
+					src: FRM.target.attr('href') + '/embed'
 				});
+
+				twitch = setBoxSize(twitch);
 			}
 			else {
 				var regx = FRM.target.attr('href').match(/twitch\.tv\/([^#\&\?\/]*)\/v\/([0-9]*)/i);
@@ -691,10 +694,7 @@
 				params = params.replace("%channel%", channel);
 				params = params.replace("%videoId%", videoId);
 
-				twitch.attr({
-					width: FRM.target.attr('data-framer-width') || 620,
-					height: FRM.target.attr('data-framer-height') || 378
-				});
+				twitch = setBoxSize(twitch);
 
 				twitch.append(params);
 			}
@@ -708,11 +708,11 @@
 
 			var soundcloud = $('<iframe frameborder="0"></iframe>');
 			soundcloud.attr({
-				src: "https://w.soundcloud.com/player/?url=" + FRM.target.attr('href'),
-				width: FRM.target.attr('data-framer-width') || settings.width,
-				height: "166"
+				src: "https://w.soundcloud.com/player/?url=" + FRM.target.attr('href')
 			});
-			
+
+			soundcloud = setBoxSize(soundcloud);
+
 			return soundcloud;
 		};
 
@@ -720,11 +720,11 @@
 		var getiFrameContents = function() {
 			var iframe = $(settings.iframe);
 			iframe.attr({
-				src: FRM.target.attr('href'),
-				width: FRM.target.attr('data-framer-width') || settings.width,
-				height: FRM.target.attr('data-framer-height') || settings.height
+				src: FRM.target.attr('href')
 			});
-			
+
+			iframe = setBoxSize(iframe);
+
 			return iframe;
 		};
 
@@ -736,10 +736,12 @@
 				dataType: FRM.target.attr('data-framer-ajax-type') || settings.ajaxDataType,
 				success: function(data) {
 					FRM.contents = $(data);
+					FRM.contents = setBoxSize(FRM.contents);
 					showContents();
 				},
 				error: function(XMLHttpRequest, textStatus) {
-					FRM.contents = $('<span>' + textStatus + '</span>');
+					FRM.contents = $('<div id="framer_error">' + textStatus + '</div>');
+					FRM.contents = setBoxSize(FRM.contents);
 					showContents();
 				}
 			});
@@ -844,6 +846,13 @@
 })(jQuery);
 
 
+/**
+ * spin.js
+ *
+ * @version		2.1.0
+ * @copyright	http://spin.js.org/
+ *
+ */
+//fgnass.github.com/spin.js#v2.1.0
+!function(a,b){"object"==typeof exports?module.exports=b():"function"==typeof define&&define.amd?define(b):a.Spinner=b()}(this,function(){"use strict";function a(a,b){var c,d=document.createElement(a||"div");for(c in b)d[c]=b[c];return d}function b(a){for(var b=1,c=arguments.length;c>b;b++)a.appendChild(arguments[b]);return a}function c(a,b,c,d){var e=["opacity",b,~~(100*a),c,d].join("-"),f=.01+c/d*100,g=Math.max(1-(1-a)/b*(100-f),a),h=j.substring(0,j.indexOf("Animation")).toLowerCase(),i=h&&"-"+h+"-"||"";return m[e]||(k.insertRule("@"+i+"keyframes "+e+"{0%{opacity:"+g+"}"+f+"%{opacity:"+a+"}"+(f+.01)+"%{opacity:1}"+(f+b)%100+"%{opacity:"+a+"}100%{opacity:"+g+"}}",k.cssRules.length),m[e]=1),e}function d(a,b){var c,d,e=a.style;for(b=b.charAt(0).toUpperCase()+b.slice(1),d=0;d<l.length;d++)if(c=l[d]+b,void 0!==e[c])return c;return void 0!==e[b]?b:void 0}function e(a,b){for(var c in b)a.style[d(a,c)||c]=b[c];return a}function f(a){for(var b=1;b<arguments.length;b++){var c=arguments[b];for(var d in c)void 0===a[d]&&(a[d]=c[d])}return a}function g(a,b){return"string"==typeof a?a:a[b%a.length]}function h(a){this.opts=f(a||{},h.defaults,n)}function i(){function c(b,c){return a("<"+b+' xmlns="urn:schemas-microsoft.com:vml" class="spin-vml">',c)}k.addRule(".spin-vml","behavior:url(#default#VML)"),h.prototype.lines=function(a,d){function f(){return e(c("group",{coordsize:k+" "+k,coordorigin:-j+" "+-j}),{width:k,height:k})}function h(a,h,i){b(m,b(e(f(),{rotation:360/d.lines*a+"deg",left:~~h}),b(e(c("roundrect",{arcsize:d.corners}),{width:j,height:d.scale*d.width,left:d.scale*d.radius,top:-d.scale*d.width>>1,filter:i}),c("fill",{color:g(d.color,a),opacity:d.opacity}),c("stroke",{opacity:0}))))}var i,j=d.scale*(d.length+d.width),k=2*d.scale*j,l=-(d.width+d.length)*d.scale*2+"px",m=e(f(),{position:"absolute",top:l,left:l});if(d.shadow)for(i=1;i<=d.lines;i++)h(i,-2,"progid:DXImageTransform.Microsoft.Blur(pixelradius=2,makeshadow=1,shadowopacity=.3)");for(i=1;i<=d.lines;i++)h(i);return b(a,m)},h.prototype.opacity=function(a,b,c,d){var e=a.firstChild;d=d.shadow&&d.lines||0,e&&b+d<e.childNodes.length&&(e=e.childNodes[b+d],e=e&&e.firstChild,e=e&&e.firstChild,e&&(e.opacity=c))}}var j,k,l=["webkit","Moz","ms","O"],m={},n={lines:12,length:7,width:5,radius:10,scale:1,rotate:0,corners:1,color:"#000",direction:1,speed:1,trail:100,opacity:.25,fps:20,zIndex:2e9,className:"spinner",top:"50%",left:"50%",position:"absolute"};if(h.defaults={},f(h.prototype,{spin:function(b){this.stop();var c=this,d=c.opts,f=c.el=e(a(0,{className:d.className}),{position:d.position,width:0,zIndex:d.zIndex});if(e(f,{left:d.left,top:d.top}),b&&b.insertBefore(f,b.firstChild||null),f.setAttribute("role","progressbar"),c.lines(f,c.opts),!j){var g,h=0,i=(d.lines-1)*(1-d.direction)/2,k=d.fps,l=k/d.speed,m=(1-d.opacity)/(l*d.trail/100),n=l/d.lines;!function o(){h++;for(var a=0;a<d.lines;a++)g=Math.max(1-(h+(d.lines-a)*n)%l*m,d.opacity),c.opacity(f,a*d.direction+i,g,d);c.timeout=c.el&&setTimeout(o,~~(1e3/k))}()}return c},stop:function(){var a=this.el;return a&&(clearTimeout(this.timeout),a.parentNode&&a.parentNode.removeChild(a),this.el=void 0),this},lines:function(d,f){function h(b,c){return e(a(),{position:"absolute",width:f.scale*(f.length+f.width)+"px",height:f.scale*f.width+"px",background:b,boxShadow:c,transformOrigin:"left",transform:"rotate("+~~(360/f.lines*k+f.rotate)+"deg) translate("+f.scale*f.radius+"px,0)",borderRadius:(f.corners*f.scale*f.width>>1)+"px"})}for(var i,k=0,l=(f.lines-1)*(1-f.direction)/2;k<f.lines;k++)i=e(a(),{position:"absolute",top:1+~(f.scale*f.width/2)+"px",transform:f.hwaccel?"translate3d(0,0,0)":"",opacity:f.opacity,animation:j&&c(f.opacity,f.trail,l+k*f.direction,f.lines)+" "+1/f.speed+"s linear infinite"}),f.shadow&&b(i,e(h("#000","0 0 4px #000"),{top:"2px"})),b(d,b(i,h(g(f.color,k),"0 0 1px rgba(0,0,0,.1)")));return d},opacity:function(a,b,c){b<a.childNodes.length&&(a.childNodes[b].style.opacity=c)}}),"undefined"!=typeof document){k=function(){var c=a("style",{type:"text/css"});return b(document.getElementsByTagName("head")[0],c),c.sheet||c.styleSheet}();var o=e(a("group"),{behavior:"url(#default#VML)"});!d(o,"transform")&&o.adj?i():j=d(o,"animation")}return h});
 
-//fgnass.github.com/spin.js#v2.0.1
-!function(a,b){"object"==typeof exports?module.exports=b():"function"==typeof define&&define.amd?define(b):a.Spinner=b()}(this,function(){"use strict";function a(a,b){var c,d=document.createElement(a||"div");for(c in b)d[c]=b[c];return d}function b(a){for(var b=1,c=arguments.length;c>b;b++)a.appendChild(arguments[b]);return a}function c(a,b,c,d){var e=["opacity",b,~~(100*a),c,d].join("-"),f=.01+c/d*100,g=Math.max(1-(1-a)/b*(100-f),a),h=j.substring(0,j.indexOf("Animation")).toLowerCase(),i=h&&"-"+h+"-"||"";return l[e]||(m.insertRule("@"+i+"keyframes "+e+"{0%{opacity:"+g+"}"+f+"%{opacity:"+a+"}"+(f+.01)+"%{opacity:1}"+(f+b)%100+"%{opacity:"+a+"}100%{opacity:"+g+"}}",m.cssRules.length),l[e]=1),e}function d(a,b){var c,d,e=a.style;for(b=b.charAt(0).toUpperCase()+b.slice(1),d=0;d<k.length;d++)if(c=k[d]+b,void 0!==e[c])return c;return void 0!==e[b]?b:void 0}function e(a,b){for(var c in b)a.style[d(a,c)||c]=b[c];return a}function f(a){for(var b=1;b<arguments.length;b++){var c=arguments[b];for(var d in c)void 0===a[d]&&(a[d]=c[d])}return a}function g(a,b){return"string"==typeof a?a:a[b%a.length]}function h(a){this.opts=f(a||{},h.defaults,n)}function i(){function c(b,c){return a("<"+b+' xmlns="urn:schemas-microsoft.com:vml" class="spin-vml">',c)}m.addRule(".spin-vml","behavior:url(#default#VML)"),h.prototype.lines=function(a,d){function f(){return e(c("group",{coordsize:k+" "+k,coordorigin:-j+" "+-j}),{width:k,height:k})}function h(a,h,i){b(m,b(e(f(),{rotation:360/d.lines*a+"deg",left:~~h}),b(e(c("roundrect",{arcsize:d.corners}),{width:j,height:d.width,left:d.radius,top:-d.width>>1,filter:i}),c("fill",{color:g(d.color,a),opacity:d.opacity}),c("stroke",{opacity:0}))))}var i,j=d.length+d.width,k=2*j,l=2*-(d.width+d.length)+"px",m=e(f(),{position:"absolute",top:l,left:l});if(d.shadow)for(i=1;i<=d.lines;i++)h(i,-2,"progid:DXImageTransform.Microsoft.Blur(pixelradius=2,makeshadow=1,shadowopacity=.3)");for(i=1;i<=d.lines;i++)h(i);return b(a,m)},h.prototype.opacity=function(a,b,c,d){var e=a.firstChild;d=d.shadow&&d.lines||0,e&&b+d<e.childNodes.length&&(e=e.childNodes[b+d],e=e&&e.firstChild,e=e&&e.firstChild,e&&(e.opacity=c))}}var j,k=["webkit","Moz","ms","O"],l={},m=function(){var c=a("style",{type:"text/css"});return b(document.getElementsByTagName("head")[0],c),c.sheet||c.styleSheet}(),n={lines:12,length:7,width:5,radius:10,rotate:0,corners:1,color:"#000",direction:1,speed:1,trail:100,opacity:.25,fps:20,zIndex:2e9,className:"spinner",top:"50%",left:"50%",position:"absolute"};h.defaults={},f(h.prototype,{spin:function(b){this.stop();{var c=this,d=c.opts,f=c.el=e(a(0,{className:d.className}),{position:d.position,width:0,zIndex:d.zIndex});d.radius+d.length+d.width}if(e(f,{left:d.left,top:d.top}),b&&b.insertBefore(f,b.firstChild||null),f.setAttribute("role","progressbar"),c.lines(f,c.opts),!j){var g,h=0,i=(d.lines-1)*(1-d.direction)/2,k=d.fps,l=k/d.speed,m=(1-d.opacity)/(l*d.trail/100),n=l/d.lines;!function o(){h++;for(var a=0;a<d.lines;a++)g=Math.max(1-(h+(d.lines-a)*n)%l*m,d.opacity),c.opacity(f,a*d.direction+i,g,d);c.timeout=c.el&&setTimeout(o,~~(1e3/k))}()}return c},stop:function(){var a=this.el;return a&&(clearTimeout(this.timeout),a.parentNode&&a.parentNode.removeChild(a),this.el=void 0),this},lines:function(d,f){function h(b,c){return e(a(),{position:"absolute",width:f.length+f.width+"px",height:f.width+"px",background:b,boxShadow:c,transformOrigin:"left",transform:"rotate("+~~(360/f.lines*k+f.rotate)+"deg) translate("+f.radius+"px,0)",borderRadius:(f.corners*f.width>>1)+"px"})}for(var i,k=0,l=(f.lines-1)*(1-f.direction)/2;k<f.lines;k++)i=e(a(),{position:"absolute",top:1+~(f.width/2)+"px",transform:f.hwaccel?"translate3d(0,0,0)":"",opacity:f.opacity,animation:j&&c(f.opacity,f.trail,l+k*f.direction,f.lines)+" "+1/f.speed+"s linear infinite"}),f.shadow&&b(i,e(h("#000","0 0 4px #000"),{top:"2px"})),b(d,b(i,h(g(f.color,k),"0 0 1px rgba(0,0,0,.1)")));return d},opacity:function(a,b,c){b<a.childNodes.length&&(a.childNodes[b].style.opacity=c)}});var o=e(a("group"),{behavior:"url(#default#VML)"});return!d(o,"transform")&&o.adj?i():j=d(o,"animation"),h});
