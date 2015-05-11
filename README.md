@@ -6,6 +6,10 @@ Support for images, Youtube, Vimeo, SoundCloud, Twitch, iframe, ajax and HTML5 V
 
 include [spin.js](http://fgnass.github.io/spin.js/).
 
+CSSアニメーションは、http://tympanus.net/Development/ModalWindowEffects/ を参考にさせて頂きました。
+
+ウィンドウサイズに対して、resizeRatioで指定された比率が最大サイズとなるように表示されるので、ある意味レスポンシブ。
+
 Setup & Sample
 -------
 http://labs.eternitydesign.net/jquery.framer/
