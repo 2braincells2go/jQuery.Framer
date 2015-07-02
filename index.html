@@ -237,6 +237,9 @@
 			<h1>Options</h1>
 			<pre class="prettyprint lang-js">
 	$('.framer').Framer({
+		animation: "fade",
+		loader: "spin",
+		loaderColor: '#fff',
 		opacity: 0.8,
 		overlayTime: 500,
 		isOverlayClose: true,
@@ -259,7 +262,11 @@
 			<div class="options">
 				<h3>オプション一覧</h3>
 				<dl>
-				<dt>loadingColor</dt><!--
+				<dt>animation</dt><!--
+				--><dd>デフォルトアニメーションの設定。"fade"以外はCSS Animation</dd>
+				<dt>loader</dt><!--
+				--><dd>ローダーの指定。"spin"でspin.js使用。</dd>
+				<dt>loaderColor</dt><!--
 				--><dd>ローディングスピナーのカラー指定</dd>
 				<dt>overlayTime</dt><!--
 				--><dd>Overlayのフェードスピード</dd>

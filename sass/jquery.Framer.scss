@@ -33,6 +33,7 @@
 #frm_loader {
 	position: absolute;
 	left: 0;
+	z-index: 2000;
 
 	.circle_loader {
 		width: 48px;

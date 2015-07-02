@@ -24,6 +24,7 @@
 #frm_loader {
   position: absolute;
   left: 0;
+  z-index: 2000;
 }
 #frm_loader .circle_loader {
   width: 48px;
